@@ -18,4 +18,4 @@ venv\lib\site-packages\ipywidgets\widgets\widget_selection.py:9
 
 -- Docs: https://docs.pytest.org/en/latest/warnings.html
 --- generated xml file: C:\Users\darci\codenation\data-science-1\output.xml ---
-==================== 5 passed, 2 warnings in 4.33 seconds =====================
+==================== 5 passed, 2 warnings in 6.71 seconds =====================
