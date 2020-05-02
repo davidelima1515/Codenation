@@ -11,20 +11,20 @@
 
 # ## _Set up_ da análise
 
-# In[1]:
+# In[84]:
 
 
 import pandas as pd
 import numpy as np
 
 
-# In[2]:
+# In[85]:
 
 
 black_friday = pd.read_csv('black_friday.csv')
 
 
-# In[3]:
+# In[86]:
 
 
 black_friday.shape
@@ -36,12 +36,12 @@ black_friday.shape
 # 
 # Quantas observações e quantas colunas há no dataset? Responda no formato de uma tuple `(n_observacoes, n_colunas)`.
 
-# In[4]:
+# In[87]:
 
 
 def q1():
-    # Retorne aqui o resultado da questão 1.
-    return black_friday.shape
+    res = black_friday.shape 
+    return res
     
 
 
@@ -50,45 +50,36 @@ def q1():
 # 
 # Há quantas mulheres com idade entre 26 e 35 anos no dataset? Responda como um único escalar.
 
-# In[29]:
+# In[88]:
 
 
 def q2():
-    # Retorne aqui o resultado da questão 2.
-    return (black_friday[black_friday['Gender']=='F']['Age']=='26-35').sum()
-
-    
-
-
-# In[27]:
-
-
-#return len(black_friday.query('Gender == "F" &  Age == "26-35"')
-    
+    res = (black_friday[black_friday['Gender']=='F']['Age']=='26-35').sum()
+    return int(res)
 
 
 # # Questão 3 
 # 
 # Quantos usuários únicos há no dataset? Responda como um único escalar.
 
-# In[41]:
+# In[89]:
 
 
 def q3():
-    # Retorne aqui o resultado da questão 3.
-    return black_friday['User_ID'].nunique()
+    res = black_friday['User_ID'].nunique()
+    return res
 
 
 # # Questão 4
 # 
 # Quantos tipos de dados diferentes existem no dataset? Responda como um único escalar.
 
-# In[42]:
+# In[90]:
 
 
 def q4():
-    # Retorne aqui o resultado da questão 4.
-    return black_friday.dtypes.nunique()
+    res = black_friday.dtypes.nunique()
+    return res
     
 
 
@@ -96,12 +87,12 @@ def q4():
 # 
 # Qual porcentagem dos registros possui ao menos um valor null (`None`, `ǸaN` etc)? Responda como um único escalar entre 0 e 1.
 
-# In[43]:
+# In[91]:
 
 
 def q5():
-    # Retorne aqui o resultado da questão 5.
-    return 1 - len(black_friday.dropna())/ len(black_friday)
+    res = (1 - len(black_friday.dropna())/ len(black_friday))
+    return res
     
 
 
@@ -109,31 +100,25 @@ def q5():
 # 
 # Quantos valores null existem na variável (coluna) com o maior número de null? Responda como um único escalar.
 
-# In[50]:
+# In[92]:
 
 
 def q6():
-    # Retorne aqui o resultado da questão 6.
-    return int(black_friday.isna().sum().max())
+    res = black_friday.isna().sum().max()
+    return int(res)
     
-
-
-# In[49]:
-
-
-
 
 
 # ## Questão 7
 # 
 # Qual o valor mais frequente (sem contar nulls) em `Product_Category_3`? Responda como um único escalar.
 
-# In[1]:
+# In[93]:
 
 
 def q7():
-    # Retorne aqui o resultado da questão 7.
-    return int(black_friday['Product_Category_3'].mode())
+    res = black_friday['Product_Category_3'].mode()
+    return int(res)
     
 
 
@@ -141,20 +126,15 @@ def q7():
 # 
 # Qual a nova média da variável (coluna) `Purchase` após sua normalização? Responda como um único escalar.
 
-# In[ ]:
-
-
-
-
-
-# In[334]:
+# In[94]:
 
 
 def q8():
     # Retorne aqui o resultado da questão 8.
     df_aux = black_friday['Purchase']
     black_friday_norm = (df_aux - df_aux.min())/(df_aux.max() - df_aux.min())
-    return float(black_friday_norm.mean())
+    res = black_friday_norm.mean()
+    return float(res)
     
 
 
@@ -162,14 +142,15 @@ def q8():
 # 
 # Quantas ocorrências entre -1 e 1 inclusive existem da variáel `Purchase` após sua padronização? Responda como um único escalar.
 
-# In[335]:
+# In[82]:
 
 
 def q9():
     # Retorne aqui o resultado da questão 9.
     df_aux = black_friday['Purchase']
     black_friday_padr= (df_aux - df_aux.mean())/df_aux.std()
-    return int(black_friday_padr.between(-1,1).sum())
+    res=black_friday_padr.between(-1,1).sum()
+    return int(res)
     
 
 
@@ -177,21 +158,15 @@ def q9():
 # 
 # Podemos afirmar que se uma observação é null em `Product_Category_2` ela também o é em `Product_Category_3`? Responda com um bool (`True`, `False`).
 
-# In[348]:
+# In[81]:
 
 
 def q10():
-    # Retorne aqui o resultado da questão 10.
-    if any(black_friday['Product_Category_2'].isna() & black_friday['Product_Category_3'].notna()) == False:
+    res = any(black_friday['Product_Category_2'].isna() & black_friday['Product_Category_3'].notna())
+    if res == False:
         return True
     else:
         return False
         
     
-
-
-# In[ ]:
-
-
-
 
