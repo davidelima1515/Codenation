@@ -11,7 +11,7 @@
 
 # ## _Setup_ geral
 
-# In[4]:
+# In[106]:
 
 
 import pandas as pd
@@ -21,7 +21,7 @@ import scipy.stats as sct
 import seaborn as sns
 
 
-# In[5]:
+# In[107]:
 
 
 #%matplotlib inline
@@ -34,13 +34,13 @@ figsize(12, 8)
 sns.set()
 
 
-# In[6]:
+# In[108]:
 
 
 athletes = pd.read_csv("athletes.csv")
 
 
-# In[7]:
+# In[109]:
 
 
 def get_sample(df, col_name, n=100, seed=42):
@@ -76,27 +76,27 @@ def get_sample(df, col_name, n=100, seed=42):
 
 # ## Inicia sua análise a partir daqui
 
-# In[13]:
+# In[110]:
 
 
 height = get_sample(athletes, 'height', n =3000)
 weight = get_sample(athletes, 'weight', n=3000)
+alpha = 0.05
 
 
 # ## Questão 1
 # 
 # Considerando uma amostra de tamanho 3000 da coluna `height` obtida com a função `get_sample()`, execute o teste de normalidade de Shapiro-Wilk com a função `scipy.stats.shapiro()`. Podemos afirmar que as alturas são normalmente distribuídas com base nesse teste (ao nível de significância de 5%)? Responda com um boolean (`True` ou `False`).
 
-# In[14]:
+# In[111]:
 
 
 def q1():
-    alpha = 0.05
     w, p = sct.shapiro(height)
     if p > alpha:
-        return True #looks Gaussian
+        return True #sample looks Gaussian
     else:
-        return False #doesnt looks Gaussian    
+        return False #sample doesnt looks Gaussian    
 
 
 # __Para refletir__:
@@ -109,11 +109,10 @@ def q1():
 # 
 # Repita o mesmo procedimento acima, mas agora utilizando o teste de normalidade de Jarque-Bera através da função `scipy.stats.jarque_bera()`. Agora podemos afirmar que as alturas são normalmente distribuídas (ao nível de significância de 5%)? Responda com um boolean (`True` ou `False`).
 
-# In[12]:
+# In[112]:
 
 
 def q2():
-    alpha = 0.05
     jb_value, p = sct.jarque_bera(height)
     if p > alpha:
         return True
@@ -129,11 +128,10 @@ def q2():
 # 
 # Considerando agora uma amostra de tamanho 3000 da coluna `weight` obtida com a função `get_sample()`. Faça o teste de normalidade de D'Agostino-Pearson utilizando a função `scipy.stats.normaltest()`. Podemos afirmar que os pesos vêm de uma distribuição normal ao nível de significância de 5%? Responda com um boolean (`True` ou `False`).
 
-# In[15]:
+# In[113]:
 
 
 def q3():
-    alpha = 0.05
     statistic, p = sct.normaltest(weight)
     if p > alpha:
         return True 
@@ -151,11 +149,10 @@ def q3():
 # 
 # Realize uma transformação logarítmica em na amostra de `weight` da questão 3 e repita o mesmo procedimento. Podemos afirmar a normalidade da variável transformada ao nível de significância de 5%? Responda com um boolean (`True` ou `False`).
 
-# In[17]:
+# In[114]:
 
 
 def q4():
-    alpha = 0.05
     weight_n = np.log(weight)
     statistic, p = sct.normaltest(weight_n)
     if p > alpha:
@@ -175,36 +172,51 @@ def q4():
 # 
 # Obtenha todos atletas brasileiros, norte-americanos e canadenses em `DataFrame`s chamados `bra`, `usa` e `can`,respectivamente. Realize um teste de hipóteses para comparação das médias das alturas (`height`) para amostras independentes e variâncias diferentes com a função `scipy.stats.ttest_ind()` entre `bra` e `usa`. Podemos afirmar que as médias são estatisticamente iguais? Responda com um boolean (`True` ou `False`).
 
-# In[10]:
+# In[115]:
+
+
+alpha = 0.05
+bra = athletes[athletes['nationality']=='BRA']['height']
+usa = athletes[athletes['nationality']=='USA']['height']
+can = athletes[athletes['nationality']=='CAN']['height']
+
+
+# In[116]:
 
 
 def q5():
-    # Retorne aqui o resultado da questão 5.
-    pass
+    statistic, p = sct.ttest_ind(bra, usa,equal_var=False, nan_policy='omit')
+    if p > alpha/2 :
+        return True
+    else:
+        return False
 
 
 # ## Questão 6
 # 
 # Repita o procedimento da questão 5, mas agora entre as alturas de `bra` e `can`. Podemos afimar agora que as médias são estatisticamente iguais? Reponda com um boolean (`True` ou `False`).
 
-# In[11]:
+# In[117]:
 
 
 def q6():
-    # Retorne aqui o resultado da questão 6.
-    pass
+    statistic, p = sct.ttest_ind(bra, can,equal_var=False, nan_policy='omit')
+    if p > alpha/2:
+        return True
+    else:
+        return False
 
 
 # ## Questão 7
 # 
 # Repita o procedimento da questão 6, mas agora entre as alturas de `usa` e `can`. Qual o valor do p-valor retornado? Responda como um único escalar arredondado para oito casas decimais.
 
-# In[12]:
+# In[118]:
 
 
 def q7():
-    # Retorne aqui o resultado da questão 7.
-    pass
+    statistic, p = sct.ttest_ind(usa, can,equal_var=False, nan_policy='omit')
+    return round(p, 8).item()
 
 
 # __Para refletir__:
