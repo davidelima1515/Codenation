@@ -9,7 +9,7 @@
 
 # ## _Setup_ geral
 
-# In[126]:
+# In[189]:
 
 
 from math import sqrt
@@ -27,7 +27,7 @@ from sklearn.feature_selection import RFE
 from sklearn.linear_model import LinearRegression
 
 
-# In[101]:
+# In[190]:
 
 
 # Algumas configurações para o matplotlib.
@@ -41,13 +41,13 @@ figsize(12, 8)
 sns.set()
 
 
-# In[102]:
+# In[191]:
 
 
 fifa = pd.read_csv("fifa.csv")
 
 
-# In[103]:
+# In[192]:
 
 
 columns_to_drop = ["Unnamed: 0", "ID", "Name", "Photo", "Nationality", "Flag",
@@ -68,24 +68,47 @@ except KeyError:
 
 # ## Inicia sua análise a partir daqui
 
-# In[141]:
+# In[193]:
 
 
+#conhecendo a quantidade de linhas e colunas do dataset
+fifa.shape
+#conhecendo os tipos de cada variável 
+fifa.dtypes
+#conhecendo as variaveis das 5primeiras linhas do dataset
+fifa.head()
+#conhecendo as variaveis das 5 ultimas linhas do dataset 
+fifa.tail(5) 
+#conferindo se existe valor NAN 
+fifa.isna().sum()
+#Como são poucos valores NAN, uma solução seria dropar as linhas 
+#retirando os valores NAN do dataset
 fifa.dropna(inplace=True)
+
+
+# In[194]:
+
+
+#Novo shape 
+fifa.shape
 
 
 # ## Questão 1
 # 
 # Qual fração da variância consegue ser explicada pelo primeiro componente principal de `fifa`? Responda como um único float (entre 0 e 1) arredondado para três casas decimais.
 
-# In[142]:
+# In[195]:
 
 
 def q1():
-    pca = PCA()
-    pca.fit(fifa)
-    res =  np.round(pca.explained_variance_ratio_[0],3)
-    return float(res)
+    #instanciando PCA na variável pca.
+    pca = PCA() 
+    #treinando dataset.
+    pca.fit(fifa) 
+    #extraindo EVR do primeiro componente e aproximando 3 casas decimais. 
+    res =  np.round(pca.explained_variance_ratio_[0],3) 
+    #retornando em forma de float.
+    return float(res) 
 q1()
 
 
@@ -93,13 +116,19 @@ q1()
 # 
 # Quantos componentes principais precisamos para explicar 95% da variância total? Responda como un único escalar inteiro.
 
-# In[143]:
+# In[196]:
 
 
 def q2():
-    pca_95 = PCA(n_components=0.95)
+    #instanciando PCA com o parâmetro n_components igual a 0.95,
+    #portanto, inferior a 1
+    #o que retorna o numero de componentes que explica a quantidade de variancia.
+    pca_95 = PCA(n_components=0.95) 
+    #fazendo o fit_transform do dataset fifa seguindo a instancia de PCA
     fifa_95 = pca_95.fit_transform(fifa)
+    #salvando o numero de colunas na var res
     res = fifa_95.shape[1]
+    #retornando res como inteiro
     return int(res)
 q2()
 
@@ -108,7 +137,7 @@ q2()
 # 
 # Qual são as coordenadas (primeiro e segundo componentes principais) do ponto `x` abaixo? O vetor abaixo já está centralizado. Cuidado para __não__ centralizar o vetor novamente (por exemplo, invocando `PCA.transform()` nele). Responda como uma tupla de float arredondados para três casas decimais.
 
-# In[144]:
+# In[197]:
 
 
 x = [0.87747123,  -1.24990363,  -1.3191255, -36.7341814,
@@ -124,27 +153,18 @@ x = [0.87747123,  -1.24990363,  -1.3191255, -36.7341814,
 ]
 
 
-# In[145]:
-
-
-pca = PCA(n_components=2)
-pca.fit(fifa)
-
-
-# In[ ]:
-
-
-
-
-
-# In[148]:
+# In[200]:
 
 
 def q3():
+    #instanciando PCA com parãmetro n_componentes = 2
     pca = PCA(n_components=2)
+    #treinando a instancia com o dataset 
     pca.fit(fifa)
+    #chamando o atributo componentes com o produto de X 
     res = pca.components_.dot(x)
-    return tuple(res)
+    #retornando res como tupla
+    return tuple(res.round(3))
     
 q3()
 
@@ -153,22 +173,31 @@ q3()
 # 
 # Realiza RFE com estimador de regressão linear para selecionar cinco variáveis, eliminando uma a uma. Quais são as variáveis selecionadas? Responda como uma lista de nomes de variáveis.
 
-# In[ ]:
+# In[199]:
 
 
 def q4():
-    pass
+    #instanciando a função de regressão linear do SKLEARN
+    reg = LinearRegression()
+    #instanciando a função de feature selection
+    #parâmetros: a instancia da regressão linear e a quantidade de features
+    rfe = RFE(reg, 5)
+    #tirando a coluna "target"
+    fifa_vars = fifa.drop(columns= 'Overall')
+    #isolando o "target"
+    fifa_target = fifa['Overall']
+    #treinando
+    selec = rfe.fit(fifa_vars, fifa_target) 
+    #criando uma lista vazia de resposta
+    lista_resp = []
+    #estrutura de repetição que vai do elemento 0 até o numero de colunas
+    #o IF vai percorrer a lista de support 
+    #caso positivo, a feature será adicionada a lista 
+    for i in range(0, fifa_vars.shape[1]):
+        if selec.support_[i] == True:
+            lista_resp.append(fifa_vars.columns[i])
+        
+    return lista_resp
 
-
-# In[128]:
-
-
-reg = LinearRegression()
-rfe = RFE(reg)
-
-
-# In[ ]:
-
-
-
+q4()
 
