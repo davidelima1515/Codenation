@@ -9,16 +9,19 @@
 
 # ## _Setup_ geral
 
-# In[1]:
+# In[652]:
 
 
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import sklearn as sk
+from sklearn.preprocessing  import KBinsDiscretizer, OneHotEncoder, StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 
 
-# In[2]:
+# In[653]:
 
 
 # Algumas configurações para o matplotlib.
@@ -32,13 +35,13 @@ figsize(12, 8)
 sns.set()
 
 
-# In[3]:
+# In[654]:
 
 
-countries = pd.read_csv("countries.csv")
+countries = pd.read_csv("countries.csv", decimal=',')
 
 
-# In[4]:
+# In[655]:
 
 
 new_column_names = [
@@ -48,9 +51,36 @@ new_column_names = [
     "Industry", "Service"
 ]
 
+#pré-processamento
 countries.columns = new_column_names
+try:
+    for i in range(0, countries['Region'].shape[0]):
+                   countries['Region'][i] = countries['Region'][i].strip()
+except:
+    pass 
 
 countries.head(5)
+
+
+# In[656]:
+
+
+countries.shape
+
+
+# In[657]:
+
+
+df_aux = pd.DataFrame({
+                'tipos': countries.dtypes,
+                'total': countries.shape[0],
+                'faltantes':countries.isna().sum(),
+                '% faltante': 100*countries.isna().sum() / countries.shape[0]
+})
+
+countries['Climate'].fillna(0, inplace=True)
+
+df_aux
 
 
 # ## Observações
@@ -59,41 +89,24 @@ countries.head(5)
 # 
 # Além disso, as variáveis `Country` e `Region` possuem espaços a mais no começo e no final da string. Você pode utilizar o método `str.strip()` para remover esses espaços.
 
+# In[ ]:
+
+
+
+
+
 # ## Inicia sua análise a partir daqui
-
-# In[43]:
-
-
-# Sua análise começa aqui.
-lista_resp = []
-for i in range(0, countries['Region'].nunique()):
-    lista_resp.append(countries['Region'].unique()[i].strip())
-lista_resp
-    
-    
-    
-    
-
-
-# In[36]:
-
-
-countries['Region'].unique()
-
 
 # ## Questão 1
 # 
 # Quais são as regiões (variável `Region`) presentes no _data set_? Retorne uma lista com as regiões únicas do _data set_ com os espaços à frente e atrás da string removidos (mas mantenha pontuação: ponto, hífen etc) e ordenadas em ordem alfabética.
 
-# In[47]:
+# In[658]:
 
 
 def q1():
-    lista_resp = []
-    for i in range(0, countries['Region'].nunique()):
-        lista_resp.append(countries['Region'].unique()[i].strip())
-        lista_resp.sort()
-    return lista_resp
+    resp = countries['Region'].unique()
+    return list(resp)
 q1()
 
 
@@ -101,24 +114,29 @@ q1()
 # 
 # Discretizando a variável `Pop_density` em 10 intervalos com `KBinsDiscretizer`, seguindo o encode `ordinal` e estratégia `quantile`, quantos países se encontram acima do 90º percentil? Responda como um único escalar inteiro.
 
-# In[7]:
+# In[659]:
 
 
 def q2():
-    # Retorne aqui o resultado da questão 2.
-    pass
+    discr = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='quantile')
+    x = discr.fit_transform(countries['Pop_density'].values.reshape(-1,1))
+    return int((x>=9).sum())
+q2()
 
 
 # # Questão 3
 # 
 # Se codificarmos as variáveis `Region` e `Climate` usando _one-hot encoding_, quantos novos atributos seriam criados? Responda como um único escalar.
 
-# In[9]:
+# In[660]:
 
 
 def q3():
-    # Retorne aqui o resultado da questão 3.
-    pass
+    encoding = OneHotEncoder(sparse=False)
+    encoded = encoding.fit_transform(countries[['Region', 'Climate']])
+
+    return encoded.shape[1]
+q3()
 
 
 # ## Questão 4
@@ -130,7 +148,7 @@ def q3():
 # 
 # Após aplicado o _pipeline_ descrito acima aos dados (somente nas variáveis dos tipos especificados), aplique o mesmo _pipeline_ (ou `ColumnTransformer`) ao dado abaixo. Qual o valor da variável `Arable` após o _pipeline_? Responda como um único float arredondado para três casas decimais.
 
-# In[10]:
+# In[661]:
 
 
 test_country = [
@@ -144,12 +162,25 @@ test_country = [
 ]
 
 
-# In[11]:
+# In[663]:
 
 
 def q4():
-    # Retorne aqui o resultado da questão 4.
-    pass
+    criando_pipe = Pipeline(steps=[
+                                ('imputer',SimpleImputer(strategy="median")),
+                                ('standardscaler', StandardScaler())
+                                ])
+    lista = []
+    for i in countries.columns:
+        if countries[i].dtypes == 'float64' or countries[i].dtypes == 'int64':
+            lista.append(i)
+        
+    implementador = criando_pipe.fit(countries[lista])
+
+    novo_df = pd.DataFrame([test_country], columns=countries.columns)
+    resp = implementador.transform(novo_df[lista])[0][lista.index('Arable')].round(3)
+    return float(resp)
+q4()
 
 
 # ## Questão 5
@@ -162,7 +193,7 @@ def q4():
 # 
 # Você deveria remover da análise as observações consideradas _outliers_ segundo esse método? Responda como uma tupla de três elementos `(outliers_abaixo, outliers_acima, removeria?)` ((int, int, bool)).
 
-# In[12]:
+# In[ ]:
 
 
 def q5():
@@ -183,7 +214,7 @@ def q5():
 # 
 # Aplique `CountVectorizer` ao _data set_ `newsgroups` e descubra o número de vezes que a palavra _phone_ aparece no corpus. Responda como um único escalar.
 
-# In[13]:
+# In[ ]:
 
 
 def q6():
@@ -195,7 +226,7 @@ def q6():
 # 
 # Aplique `TfidfVectorizer` ao _data set_ `newsgroups` e descubra o TF-IDF da palavra _phone_. Responda como um único escalar arredondado para três casas decimais.
 
-# In[14]:
+# In[ ]:
 
 
 def q7():
