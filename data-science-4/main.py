@@ -9,7 +9,7 @@
 
 # ## _Setup_ geral
 
-# In[652]:
+# In[712]:
 
 
 import pandas as pd
@@ -19,9 +19,10 @@ import sklearn as sk
 from sklearn.preprocessing  import KBinsDiscretizer, OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.datasets import fetch_20newsgroups
 
 
-# In[653]:
+# In[713]:
 
 
 # Algumas configurações para o matplotlib.
@@ -35,13 +36,13 @@ figsize(12, 8)
 sns.set()
 
 
-# In[654]:
+# In[714]:
 
 
 countries = pd.read_csv("countries.csv", decimal=',')
 
 
-# In[655]:
+# In[715]:
 
 
 new_column_names = [
@@ -62,13 +63,13 @@ except:
 countries.head(5)
 
 
-# In[656]:
+# In[716]:
 
 
 countries.shape
 
 
-# In[657]:
+# In[717]:
 
 
 df_aux = pd.DataFrame({
@@ -101,7 +102,7 @@ df_aux
 # 
 # Quais são as regiões (variável `Region`) presentes no _data set_? Retorne uma lista com as regiões únicas do _data set_ com os espaços à frente e atrás da string removidos (mas mantenha pontuação: ponto, hífen etc) e ordenadas em ordem alfabética.
 
-# In[658]:
+# In[718]:
 
 
 def q1():
@@ -114,7 +115,7 @@ q1()
 # 
 # Discretizando a variável `Pop_density` em 10 intervalos com `KBinsDiscretizer`, seguindo o encode `ordinal` e estratégia `quantile`, quantos países se encontram acima do 90º percentil? Responda como um único escalar inteiro.
 
-# In[659]:
+# In[719]:
 
 
 def q2():
@@ -128,7 +129,7 @@ q2()
 # 
 # Se codificarmos as variáveis `Region` e `Climate` usando _one-hot encoding_, quantos novos atributos seriam criados? Responda como um único escalar.
 
-# In[660]:
+# In[720]:
 
 
 def q3():
@@ -148,7 +149,7 @@ q3()
 # 
 # Após aplicado o _pipeline_ descrito acima aos dados (somente nas variáveis dos tipos especificados), aplique o mesmo _pipeline_ (ou `ColumnTransformer`) ao dado abaixo. Qual o valor da variável `Arable` após o _pipeline_? Responda como um único float arredondado para três casas decimais.
 
-# In[661]:
+# In[721]:
 
 
 test_country = [
@@ -162,7 +163,7 @@ test_country = [
 ]
 
 
-# In[663]:
+# In[722]:
 
 
 def q4():
@@ -193,12 +194,24 @@ q4()
 # 
 # Você deveria remover da análise as observações consideradas _outliers_ segundo esse método? Responda como uma tupla de três elementos `(outliers_abaixo, outliers_acima, removeria?)` ((int, int, bool)).
 
-# In[ ]:
+# In[725]:
 
 
 def q5():
-    # Retorne aqui o resultado da questão 4.
-    pass
+    countries['Net_migration'].dropna()
+    q1,q3 = countries['Net_migration'].quantile([0.25, 0.75])
+    iqr = q3 - q1
+    out_baixo, out_alto = int((countries['Net_migration'] < q1 - 1.5*iqr).sum()), int((countries['Net_migration'] > q3 + 1.5*iqr).sum())
+    aceitacao = bool (out_baixo/countries['Net_migration'].shape[0] < 0.05 or out_alto/countries['Net_migration'].shape[0] < 0.05)
+    return out_baixo, out_alto, aceitacao
+q5()
+
+
+# In[708]:
+
+
+#sns.boxplot(countries['Net_migration'], orient='vertical')
+#sns.distplot(countries.Net_migration)
 
 
 # ## Questão 6
