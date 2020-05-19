@@ -9,7 +9,7 @@
 
 # ## _Setup_ geral
 
-# In[712]:
+# In[20]:
 
 
 import pandas as pd
@@ -20,9 +20,10 @@ from sklearn.preprocessing  import KBinsDiscretizer, OneHotEncoder, StandardScal
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import CountVectorizer
 
 
-# In[713]:
+# In[21]:
 
 
 # Algumas configurações para o matplotlib.
@@ -36,13 +37,13 @@ figsize(12, 8)
 sns.set()
 
 
-# In[714]:
+# In[3]:
 
 
 countries = pd.read_csv("countries.csv", decimal=',')
 
 
-# In[715]:
+# In[4]:
 
 
 new_column_names = [
@@ -63,13 +64,13 @@ except:
 countries.head(5)
 
 
-# In[716]:
+# In[5]:
 
 
 countries.shape
 
 
-# In[717]:
+# In[6]:
 
 
 df_aux = pd.DataFrame({
@@ -102,7 +103,7 @@ df_aux
 # 
 # Quais são as regiões (variável `Region`) presentes no _data set_? Retorne uma lista com as regiões únicas do _data set_ com os espaços à frente e atrás da string removidos (mas mantenha pontuação: ponto, hífen etc) e ordenadas em ordem alfabética.
 
-# In[718]:
+# In[7]:
 
 
 def q1():
@@ -115,7 +116,7 @@ q1()
 # 
 # Discretizando a variável `Pop_density` em 10 intervalos com `KBinsDiscretizer`, seguindo o encode `ordinal` e estratégia `quantile`, quantos países se encontram acima do 90º percentil? Responda como um único escalar inteiro.
 
-# In[719]:
+# In[8]:
 
 
 def q2():
@@ -129,14 +130,14 @@ q2()
 # 
 # Se codificarmos as variáveis `Region` e `Climate` usando _one-hot encoding_, quantos novos atributos seriam criados? Responda como um único escalar.
 
-# In[720]:
+# In[9]:
 
 
 def q3():
     encoding = OneHotEncoder(sparse=False)
     encoded = encoding.fit_transform(countries[['Region', 'Climate']])
 
-    return encoded.shape[1]
+    return int(encoded.shape[1])
 q3()
 
 
@@ -149,7 +150,7 @@ q3()
 # 
 # Após aplicado o _pipeline_ descrito acima aos dados (somente nas variáveis dos tipos especificados), aplique o mesmo _pipeline_ (ou `ColumnTransformer`) ao dado abaixo. Qual o valor da variável `Arable` após o _pipeline_? Responda como um único float arredondado para três casas decimais.
 
-# In[721]:
+# In[10]:
 
 
 test_country = [
@@ -163,7 +164,7 @@ test_country = [
 ]
 
 
-# In[722]:
+# In[11]:
 
 
 def q4():
@@ -194,7 +195,7 @@ q4()
 # 
 # Você deveria remover da análise as observações consideradas _outliers_ segundo esse método? Responda como uma tupla de três elementos `(outliers_abaixo, outliers_acima, removeria?)` ((int, int, bool)).
 
-# In[725]:
+# In[12]:
 
 
 def q5():
@@ -207,7 +208,7 @@ def q5():
 q5()
 
 
-# In[708]:
+# In[13]:
 
 
 #sns.boxplot(countries['Net_migration'], orient='vertical')
@@ -227,12 +228,22 @@ q5()
 # 
 # Aplique `CountVectorizer` ao _data set_ `newsgroups` e descubra o número de vezes que a palavra _phone_ aparece no corpus. Responda como um único escalar.
 
-# In[ ]:
+# In[98]:
+
+
+categories = ['sci.electronics', 'comp.graphics', 'rec.motorcycles']
+newsgroup = fetch_20newsgroups(subset="train", categories=categories, shuffle=True, random_state=42)
+
+
+# In[97]:
 
 
 def q6():
-    # Retorne aqui o resultado da questão 4.
-    pass
+    vectorizer = CountVectorizer()
+    x = vectorizer.fit_transform(newsgroup.data)
+    dx = pd.DataFrame(x.toarray(), columns=vectorizer.get_feature_names())
+    return int (dx['phone'].sum())
+q6()  
 
 
 # ## Questão 7
