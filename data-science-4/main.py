@@ -9,7 +9,7 @@
 
 # ## _Setup_ geral
 
-# In[20]:
+# In[1]:
 
 
 import pandas as pd
@@ -20,10 +20,10 @@ from sklearn.preprocessing  import KBinsDiscretizer, OneHotEncoder, StandardScal
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 
-# In[21]:
+# In[2]:
 
 
 # Algumas configurações para o matplotlib.
@@ -103,12 +103,12 @@ df_aux
 # 
 # Quais são as regiões (variável `Region`) presentes no _data set_? Retorne uma lista com as regiões únicas do _data set_ com os espaços à frente e atrás da string removidos (mas mantenha pontuação: ponto, hífen etc) e ordenadas em ordem alfabética.
 
-# In[7]:
+# In[18]:
 
 
 def q1():
     resp = countries['Region'].unique()
-    return list(resp)
+    return list(sorted(resp))
 q1()
 
 
@@ -228,14 +228,14 @@ q5()
 # 
 # Aplique `CountVectorizer` ao _data set_ `newsgroups` e descubra o número de vezes que a palavra _phone_ aparece no corpus. Responda como um único escalar.
 
-# In[98]:
+# In[14]:
 
 
 categories = ['sci.electronics', 'comp.graphics', 'rec.motorcycles']
 newsgroup = fetch_20newsgroups(subset="train", categories=categories, shuffle=True, random_state=42)
 
 
-# In[97]:
+# In[15]:
 
 
 def q6():
@@ -250,10 +250,13 @@ q6()
 # 
 # Aplique `TfidfVectorizer` ao _data set_ `newsgroups` e descubra o TF-IDF da palavra _phone_. Responda como um único escalar arredondado para três casas decimais.
 
-# In[ ]:
+# In[16]:
 
 
 def q7():
-    # Retorne aqui o resultado da questão 4.
-    pass
+    tf = TfidfVectorizer()
+    news_tf = tf.fit_transform(newsgroup.data)
+    dx = pd.DataFrame(news_tf.toarray(), columns=tf.get_feature_names())
+    return float(dx['phone'].sum().round(3))
+q7()
 
